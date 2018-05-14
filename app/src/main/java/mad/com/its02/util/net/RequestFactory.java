@@ -17,7 +17,7 @@ public class RequestFactory {
 
     private RequestFactory() {
         this.mPort = "9090";
-        this.mIp = "192.168.1.2";
+        this.mIp = "192.168.2.19";
         this.mGson = new Gson();
     }
 

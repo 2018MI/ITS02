@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".login_activity.RegisterActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="用户注册"
+        android:textColor="#000"
+        android:textSize="25sp" />
+
+
+    <EditText
+        android:id="@+id/register_edt_user_name"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:hint="请输入用户名" />
+
+    <EditText
+        android:id="@+id/register_edt_user_mail"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:hint="请输入邮箱" />
+
+    <EditText
+        android:id="@+id/register_edt_user_psw"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:hint="请输入密码" />
+
+    <EditText
+        android:id="@+id/register_edt_user_confirm_psw"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:hint="请再次输入密码" />
+
+    <Button
+        android:id="@+id/register_btn_commit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="提交" />
+
+
+</LinearLayout>
