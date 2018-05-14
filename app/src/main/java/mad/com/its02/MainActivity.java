@@ -65,7 +65,6 @@ public class MainActivity extends FragmentActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_main);
-        CarSpeedListenerService.start(this);
         slidepanel = (SlidingPaneLayout) findViewById(R.id.slidingPL);
         mLightFragment = new LightFragment();
         listView = (ListView) findViewById(R.id.listView1);
@@ -166,7 +165,10 @@ public class MainActivity extends FragmentActivity {
                         tV_title.setText(actionTexts[arg2]);
                         break;
 
-
+//                    case 9:
+//                        getSupportFragmentManager().beginTransaction().replace(R.id.maincontent, new CarSpeedDataAnalyFragment()).commit();
+//                        tV_title.setText(actionTexts[arg2]);
+//                        break;
                     default:
                         break;
                 }
@@ -176,6 +178,18 @@ public class MainActivity extends FragmentActivity {
 
         fragmentManager = getFragmentManager();
         setHome();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        CarSpeedListenerService.start(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        CarSpeedListenerService.stop(this);
     }
 
     public void setHome() {
@@ -198,7 +212,6 @@ public class MainActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         mTimer.cancel();
-        CarSpeedListenerService.stop(this);
     }
 
     @Override

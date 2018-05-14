@@ -1,10 +1,13 @@
 package mad.com.its02.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -14,14 +17,19 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
 import mad.com.its02.BaseFragment;
 import mad.com.its02.R;
+import mad.com.its02.bean.MyDayBean;
 import mad.com.its02.bean.WeatherBean;
 import mad.com.its02.util.net.NetUtil;
+import mad.com.its02.widget.MyGridView;
 
 public class WeatherFragment extends BaseFragment {
 
@@ -39,8 +47,18 @@ public class WeatherFragment extends BaseFragment {
             new WeatherBean("小雪", R.drawable.xiaoxue, 0), new WeatherBean("中雪", R.drawable.zhongxue, 0),
             new WeatherBean("大雪", R.drawable.daxue, 1)
     };
+    private int[][] mWeatherRgbArr = {// 深蓝, 淡蓝, 浅灰
+            new int[]{0XFF1181E0, 0XFF3698E7, 0XFF65B6EF}, new int[]{0XFF5AB6FA, 0XFF76C1F9, 0XFFA2D2F6},//分别为开始颜色，中间夜色，结束颜色
+            new int[]{0XFF8AABCB, 0XFF9FBBD5, 0XFFBBD2E2}
+    };
+    private MyDayBean[] mMyDayBeanArr = {
+            new MyDayBean("今天"), new MyDayBean("明天"), new MyDayBean("后天"),
+            new MyDayBean(), new MyDayBean()
+    };
     private int mTemperature;
     private Random mRandom;
+    private String mTag = getClass().getName();
+    private BaseAdapter mAdapter;
 
     @Override
     protected void initListener() {
@@ -65,7 +83,8 @@ public class WeatherFragment extends BaseFragment {
 
     @Override
     protected void main() {
-        mWeatherMygridviewData.setAdapter(new MyAdapter());
+        mAdapter = new MyAdapter();
+        mWeatherMygridviewData.setAdapter(mAdapter);
     }
 
     @Override
@@ -80,6 +99,9 @@ public class WeatherFragment extends BaseFragment {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void GetSenseByName(WeatherBean weatherBean) {
         mTemperature = weatherBean.getTemperature();
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -90,33 +112,93 @@ public class WeatherFragment extends BaseFragment {
     private class MyAdapter extends BaseAdapter {
         @Override
         public int getCount() {
-            return 5;
+            return mMyDayBeanArr.length;
         }
 
         @Override
-        public WeatherBean getItem(int i) {
-            int temperature = -1;
+        public MyDayBean getItem(int i) {
+            int temperature = mTemperature;
             if (i != 0) {
-                temperature = mTemperature;
-            } else {
                 if (mRandom.nextBoolean()) {
-                    temperature += Math.min(5, 37 - mTemperature);
+                    int min = Math.min(5, 37 - mTemperature);
+                    if (min != 0) {
+                        temperature += mRandom.nextInt(min);
+                    }
                 } else {
-                    temperature += Math.min(5, mTemperature);
+                    int min = Math.min(5, mTemperature);
+                    if (min != 0) {
+                        temperature -= mRandom.nextInt(min);
+                    }
                 }
             }
-
-            return null;
+            MyDayBean myDayBean = mMyDayBeanArr[i];
+            myDayBean.setTemperatureRange(Math.max(0, temperature - 5) + "/" + Math.min(37, temperature + 5));
+            if (temperature < 10) {
+                if (mRandom.nextBoolean()) {
+                    myDayBean.setWeatherBean(mCommonWeatherBeanArr[mRandom.nextInt(mCommonWeatherBeanArr.length)]);
+                } else {
+                    myDayBean.setWeatherBean(mHibernateWeatherBeanArr[mRandom.nextInt(mHibernateWeatherBeanArr.length)]);
+                }
+            } else {
+                myDayBean.setWeatherBean(mCommonWeatherBeanArr[mRandom.nextInt(mCommonWeatherBeanArr.length)]);
+            }
+            String desc = myDayBean.getDesc();
+            if (desc == null) {
+                Calendar calendar = Calendar.getInstance(Locale.CHINA);
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + i);
+                myDayBean.setDesc(calendar.get(Calendar.DAY_OF_MONTH) + "日" + "(" + String.format("%tA", calendar.getTime()) + ")");
+            }
+            return myDayBean;
         }
 
         @Override
         public long getItemId(int i) {
-            return 0;
+            return i;
         }
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            return null;
+            ViewHolder viewHolder;
+            if (view == null) {
+                view = LayoutInflater.from(mFragmentActivity).inflate(R.layout.item_weather_mygridview_data,
+                        mWeatherMygridviewData, false);
+                viewHolder = new ViewHolder(view);
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            view.setLayoutParams(new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, viewGroup.getHeight()));
+            if (((MyGridView) viewGroup).isIsisMeasure()) {
+                return view;
+            }
+            Log.d(mTag, "i = " + i);
+            MyDayBean myDayBean = getItem(i);
+            viewHolder.weather_tv_lvdayinfo.setText(myDayBean.getDesc());
+            viewHolder.weather_iv_lvicon.setImageResource(myDayBean.getWeatherBean().getResId());
+            viewHolder.weather_tv_lv_desc.setText(myDayBean.getWeatherBean().getDesc());
+            viewHolder.weather_tv_lvtemperature.setText(myDayBean.getTemperatureRange() + "℃");
+
+            return view;
         }
+
+
     }
+
+    private static class ViewHolder {
+        public View rootView;
+        public TextView weather_tv_lvdayinfo;
+        public ImageView weather_iv_lvicon;
+        public TextView weather_tv_lv_desc;
+        public TextView weather_tv_lvtemperature;
+
+        public ViewHolder(View rootView) {
+            this.rootView = rootView;
+            this.weather_tv_lvdayinfo = (TextView) rootView.findViewById(R.id.weather_tv_lvdayinfo);
+            this.weather_iv_lvicon = (ImageView) rootView.findViewById(R.id.weather_iv_lvicon);
+            this.weather_tv_lv_desc = (TextView) rootView.findViewById(R.id.weather_tv_lv_desc);
+            this.weather_tv_lvtemperature = (TextView) rootView.findViewById(R.id.weather_tv_lvtemperature);
+        }
+
+    }
+
 }

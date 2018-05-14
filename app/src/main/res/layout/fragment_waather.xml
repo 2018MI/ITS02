@@ -55,6 +55,8 @@
         android:textSize="25sp" />
 
     <mad.com.its02.widget.MyGridView
+        android:numColumns="5"
+        android:horizontalSpacing="10dp"
         android:id="@+id/weather_mygridview_data"
         android:layout_width="match_parent"
         android:layout_height="0dp"

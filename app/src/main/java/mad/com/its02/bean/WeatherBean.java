@@ -37,6 +37,9 @@ public class WeatherBean {
         this.level = level;
     }
 
+    public WeatherBean() {
+    }
+
     public Integer getTemperature() {
         return temperature;
     }
