@@ -1,0 +1,39 @@
+查询小车账户余额
+URL: http://192.168.1.2:9090/transportservice/action/GetCarAccountBalance.do
+请求参数:{"CarId":2}
+返回参数:{"serverInfo":{"Balance":100}}
+
+小车账户充值
+URL: http://192.168.1.2:9090/transportservice/action/SetCarAccountRecharge.do
+请求参数:{"CarId":1,"Money":200}
+返回参数:{"serverInfo":{"result":"ok"}}
+
+设置自动/手工控制模式(路灯)
+URL: http://192.168.1.2:9090/transportservice/action/SetRoadLightControlMode.do
+请求参数:{"ControlMode":"Manual"}
+返回参数:{"serverInfo":{"result":"ok"}}
+
+手动打开/关闭定路灯
+URL: http://192.168.1.2:9090/transportservice/action/SetRoadLightStatusAction.do
+请求参数:{"RoadLightId":1,"Action":"Close"}
+返回参数:{"serverInfo":{"result":"ok"}}
+
+ 查询当前路灯状态
+URL: http://192.168.1.2:9090/transportservice/action/GetRoadLightStatus.do
+请求参数:{"RoadLightId":1}
+返回参数:{"serverInfo":{"Status":"Open"}}
+
+查询“所有传感器”的当前值
+URL: http://192.168.1.2:9090/transportservice/action/GetAllSense.do
+请求参数:{}
+返回参数:{"serverInfo":{"pm2.5":170,"co2":3404,"temperature":16,"LightIntensity":696,"humidity":32}}
+
+查询道路状态
+URL: http://192.168.1.2:9090/transportservice/action/GetRoadStatus.do
+请求参数:{"RoadId":1}
+返回参数:{"serverInfo":{"Status":3}}
+
+查询小车当前速度
+URL: http://192.168.1.2:9090/transportservice/type/jason/action/GetCarSpeed.do
+请求参数:{"CarId":2}
+返回参数:{"serverInfo":{"CarSpeed":235}}
